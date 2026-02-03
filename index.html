@@ -8,98 +8,111 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Noto Sans TC', sans-serif; box-sizing: border-box; }
-        .sudoku-grid { display: grid; grid-template-columns: repeat(9, 1fr); background-color: #1e3a8a; border: 3px solid #1e3a8a; gap: 1px; }
-        .sudoku-cell { width: 100%; aspect-ratio: 1/1; text-align: center; background: white; font-size: 1.25rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .sudoku-cell:hover { background: #f0f9ff; }
-        .sudoku-cell.selected { background: #dbeafe !important; box-shadow: inset 0 0 0 2px #3b82f6; }
-        .sudoku-cell.preset { background: #f1f5f9; color: #1e40af; font-weight: 800; cursor: not-allowed; }
+        .sudoku-grid { display: grid; grid-template-columns: repeat(9, 1fr); background-color: #1e3a8a; border: 3px solid #1e3a8a; gap: 1px; border-radius: 8px; overflow: hidden; }
+        .sudoku-cell { width: 100%; aspect-ratio: 1/1; text-align: center; background: white; font-size: 1.5rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; position: relative; }
+        
+        /* 選中狀態：更明顯的藍色外框 */
+        .sudoku-cell.selected { background: #eff6ff !important; outline: 3px solid #3b82f6; z-index: 10; transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        
+        .sudoku-cell.preset { background: #f8fafc; color: #1e40af; font-weight: 800; cursor: not-allowed; }
+        .sudoku-cell:not(.preset):hover { background: #f1f5f9; }
+
+        /* 3x3 粗線條 */
         .border-r-thick { border-right: 3px solid #1e3a8a !important; }
         .border-b-thick { border-bottom: 3px solid #1e3a8a !important; }
+        
+        .numpad-btn { background: white; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 700; font-size: 1.25rem; height: 60px; transition: all 0.2s; color: #1e40af; }
+        .numpad-btn:active { transform: scale(0.95); background: #3b82f6; color: white; }
     </style>
 </head>
-<body class="h-full bg-slate-100 text-slate-900">
+<body class="h-full bg-slate-50 text-slate-900">
 
     <div id="app" class="max-w-xl mx-auto min-h-full p-4 flex flex-col">
         
-        <header class="text-center py-6">
-            <h1 class="text-3xl font-extrabold text-blue-900 tracking-tight">MOSSJSS Sudoku</h1>
-            <p class="text-blue-600 font-medium">Level 2 數據採集系統</p>
+        <header class="text-center py-8">
+            <h1 class="text-4xl font-black text-blue-900 tracking-tight mb-1">MOSSJSS Sudoku</h1>
+            <div class="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">Level 2 Data System</div>
         </header>
 
-        <main id="reg-screen" class="bg-white p-8 rounded-3xl shadow-xl border border-blue-100">
-            <form id="reg-form" class="space-y-5">
+        <main id="reg-screen" class="bg-white p-8 rounded-[2rem] shadow-2xl border border-blue-50">
+            <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+                <span class="w-2 h-6 bg-blue-600 rounded-full"></span> 學生資料登記
+            </h2>
+            <form id="reg-form" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">學生姓名 (Name)</label>
-                    <input type="text" id="name" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="輸入中文或英文姓名">
+                    <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">姓名 Name</label>
+                    <input type="text" id="name" required class="w-full px-5 py-4 bg-slate-50 border-0 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-lg font-medium" placeholder="輸入姓名">
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">年級 (Form)</label>
-                        <select id="year" class="w-full px-3 py-3 border rounded-xl bg-white" required>
+                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">年級 Form</label>
+                        <select id="year" class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">選擇</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">班別 (Class)</label>
-                        <select id="section" class="w-full px-3 py-3 border rounded-xl bg-white" required>
+                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">班別 Class</label>
+                        <select id="section" class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">選擇</option>
                             <option>A</option><option>G</option><option>L</option><option>S</option><option>B</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">座號 (No.)</label>
-                        <select id="num" class="w-full px-3 py-3 border rounded-xl bg-white" required></select>
+                        <label class="block text-sm font-bold text-slate-500 mb-2 ml-1">座號 No.</label>
+                        <select id="num" class="w-full px-4 py-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" required></select>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg">🎯 開始計時挑戰</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl transition-all shadow-lg shadow-blue-200 text-lg">🎯 進入挑戰</button>
             </form>
-            <button id="goto-rank" class="w-full mt-6 text-slate-500 hover:text-blue-600 text-sm font-medium transition">🏆 查看現有成績記錄</button>
+            <button id="goto-rank" class="w-full mt-8 text-slate-400 hover:text-blue-600 text-sm font-medium transition italic">🏆 查看歷史成績</button>
         </main>
 
         <main id="game-screen" class="hidden">
-            <div class="bg-white p-4 rounded-3xl shadow-xl border border-blue-100">
-                <div class="flex justify-between items-center mb-4 px-2">
-                    <div class="text-sm">
-                        <span id="p-name" class="font-bold text-blue-900"></span>
-                        <button id="autofill" class="ml-2 text-[10px] bg-slate-100 text-slate-400 px-2 py-1 rounded uppercase">Debug</button>
+            <div class="bg-white p-5 rounded-[2rem] shadow-2xl border border-blue-50">
+                <div class="flex justify-between items-end mb-6 px-2">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Player</p>
+                        <span id="p-name" class="font-black text-xl text-blue-900"></span>
                     </div>
                     <div class="text-right">
-                        <div id="timer-display" class="text-2xl font-mono font-bold text-blue-600">00:00</div>
+                        <div id="timer-display" class="text-3xl font-mono font-black text-blue-600 bg-blue-50 px-4 py-1 rounded-xl">00:00</div>
                     </div>
                 </div>
 
-                <div id="grid" class="sudoku-grid"></div>
-                <div id="numpad" class="grid grid-cols-9 gap-1 mt-6"></div>
-                <div id="msg" class="hidden mt-4 p-4 rounded-xl text-center font-bold"></div>
+                <div id="grid" class="sudoku-grid mb-8"></div>
 
-                <div class="flex gap-3 mt-6">
-                    <button id="clear" class="flex-1 bg-slate-100 py-4 rounded-xl font-bold text-slate-600">清除</button>
-                    <button id="submit" class="hidden flex-1 bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg">🏆 提交成績</button>
+                <div id="numpad" class="grid grid-cols-5 gap-3 mb-6">
+                    </div>
+
+                <div id="msg" class="hidden mb-6 p-4 rounded-2xl text-center font-bold animate-bounce"></div>
+
+                <div class="flex gap-4">
+                    <button id="submit" class="hidden flex-1 bg-green-600 text-white py-5 rounded-2xl font-bold text-xl shadow-lg shadow-green-100">🏆 提交成績</button>
+                    <button id="admin-btn" class="text-slate-200 hover:text-slate-400 transition">⚙️</button>
                 </div>
             </div>
         </main>
 
         <main id="rank-screen" class="hidden">
-            <div class="bg-white p-6 rounded-3xl shadow-xl border border-blue-100">
-                <h2 class="text-2xl font-extrabold text-slate-800 mb-6 text-center">🏆 挑戰成績匯總</h2>
-                <div class="overflow-x-auto mb-6">
+            <div class="bg-white p-8 rounded-[2rem] shadow-2xl border border-blue-50">
+                <h2 class="text-2xl font-black text-slate-800 mb-8 text-center italic">Leaderboard</h2>
+                <div class="overflow-hidden rounded-2xl border border-slate-100 mb-8">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-50 text-slate-500 uppercase">
+                        <thead class="bg-slate-50 text-slate-400 font-bold">
                             <tr>
-                                <th class="px-4 py-3">學生資訊</th>
-                                <th class="px-4 py-3">完成時間</th>
+                                <th class="px-6 py-4">STUDENT</th>
+                                <th class="px-6 py-4">TIME</th>
                             </tr>
                         </thead>
-                        <tbody id="rank-tbody" class="divide-y"></tbody>
+                        <tbody id="rank-tbody" class="divide-y divide-slate-50"></tbody>
                     </table>
                 </div>
-                <button onclick="location.reload()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold transition">返回主頁面</button>
+                <button onclick="location.reload()" class="w-full py-5 bg-slate-900 text-white rounded-2xl font-bold shadow-xl">返回首頁</button>
             </div>
         </main>
     </div>
 
     <script>
-        // 數獨題目與答案
         const PUZZLE = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
         const SOLUTION = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
 
@@ -107,7 +120,6 @@
         let player = {};
         let database = JSON.parse(localStorage.getItem('mossjss_records') || '[]');
 
-        // 初始化座號 (1-35)
         const numDropdown = document.getElementById('num');
         for(let i=1; i<=35; i++) numDropdown.add(new Option(i, i));
 
@@ -116,7 +128,6 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // 初始化網格
         function initGame() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
@@ -131,7 +142,8 @@
                     cell.textContent = PUZZLE[i];
                     cell.classList.add('preset');
                 } else {
-                    cell.onclick = () => {
+                    cell.onclick = (e) => {
+                        e.stopPropagation();
                         if(selected) selected.classList.remove('selected');
                         selected = cell;
                         cell.classList.add('selected');
@@ -141,21 +153,47 @@
                 grid.appendChild(cell);
             }
 
+            // 生成數字按鈕 (1-9 和 清除)
             const pad = document.getElementById('numpad');
             pad.innerHTML = '';
             for(let i=1; i<=9; i++) {
                 const b = document.createElement('button');
-                b.className = 'bg-blue-50 text-blue-700 py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition';
+                b.className = 'numpad-btn shadow-sm hover:shadow-md';
                 b.textContent = i;
-                b.onclick = () => {
-                    if(selected && !selected.classList.contains('preset')) {
-                        selected.textContent = i;
-                        validate();
-                    }
-                };
+                b.onclick = () => fillNumber(i);
                 pad.appendChild(b);
             }
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'numpad-btn bg-slate-50 text-slate-400 col-span-1';
+            clearBtn.textContent = '⌫';
+            clearBtn.onclick = () => fillNumber("");
+            pad.appendChild(clearBtn);
         }
+
+        // 填入數字的統一函數
+        function fillNumber(num) {
+            if(selected && !selected.classList.contains('preset')) {
+                selected.textContent = num;
+                validate();
+            }
+        }
+
+        // --- 支援鍵盤輸入 ---
+        document.addEventListener('keydown', (e) => {
+            if(e.key >= 1 && e.key <= 9) {
+                fillNumber(e.key);
+            } else if(e.key === "Backspace" || e.key === "Delete" || e.key === "0") {
+                fillNumber("");
+            }
+        });
+
+        // 點擊空白處取消選取
+        document.onclick = () => {
+            if(selected) {
+                selected.classList.remove('selected');
+                selected = null;
+            }
+        };
 
         function validate() {
             let current = "";
@@ -164,17 +202,16 @@
             if(!current.includes("0")) {
                 if(current === SOLUTION) {
                     clearInterval(interval);
-                    msg.innerHTML = "🎉 完美完成！<br>請點擊下方按鈕提交你的成績。";
-                    msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-green-50 text-green-700 block";
+                    msg.innerHTML = "✨ PERFECT! 完美完成";
+                    msg.className = "mb-6 p-4 rounded-2xl text-center font-bold bg-green-100 text-green-700 block";
                     document.getElementById('submit').classList.remove('hidden');
                 } else {
-                    msg.textContent = "⚠️ 數字填充完畢，但其中有錯誤。";
-                    msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-red-50 text-red-600 block";
+                    msg.textContent = "❌ 有些數字不正確，再檢查一下！";
+                    msg.className = "mb-6 p-4 rounded-2xl text-center font-bold bg-red-100 text-red-600 block";
                 }
             }
         }
 
-        // 登入邏輯
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
             player = {
@@ -183,7 +220,7 @@
                 section: document.getElementById('section').value,
                 num: document.getElementById('num').value
             };
-            document.getElementById('p-name').textContent = `${player.name} - ${player.year}${player.section}班 (${player.num}號)`;
+            document.getElementById('p-name').textContent = `${player.name} (${player.year}${player.section})`;
             initGame();
             switchScreen('game-screen');
             interval = setInterval(() => {
@@ -194,12 +231,11 @@
             }, 1000);
         };
 
-        // 核心：提交至 Google Form
+        // 提交至 Google Form
         document.getElementById('submit').onclick = () => {
             const finalTimeStr = document.getElementById('timer-display').textContent;
             const now = new Date().toLocaleString('zh-TW');
 
-            // 你的 Google Form 正確 ID
             const formID = "1FAIpQLSfkleuXoAlsbivdiWNYzriMBHcB4HGD_DJYWFvZmTNGvbrKnw";
             const entryIDs = {
                 name: "entry.701487326",
@@ -221,34 +257,28 @@
             params.append(entryIDs.timeStr, finalTimeStr);
             params.append(entryIDs.timestamp, now);
 
-            fetch(baseURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: params.toString()
-            }).then(() => {
-                alert("🏆 成績已成功上傳至雲端！");
-                // 本地顯示紀錄
+            fetch(baseURL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
+            .then(() => {
+                alert("🏆 成績已上傳！");
                 const record = { ...player, total_seconds: seconds, time_formatted: finalTimeStr, timestamp: now };
                 database.push(record);
                 database.sort((a,b) => a.total_seconds - b.total_seconds);
                 localStorage.setItem('mossjss_records', JSON.stringify(database));
                 renderRanks();
                 switchScreen('rank-screen');
-            }).catch(() => alert("提交失敗，請檢查網路連線。"));
+            });
         };
 
         function renderRanks() {
             const body = document.getElementById('rank-tbody');
-            body.innerHTML = database.map((r) => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-4 py-3">
+            body.innerHTML = database.slice(0, 10).map((r) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4">
                         <div class="font-bold text-slate-800">${r.name}</div>
-                        <div class="text-xs text-slate-500">${r.year}${r.section}班 | ${r.num}號</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">${r.year}${r.section} · NO.${r.num}</div>
                     </td>
-                    <td class="px-4 py-3">
-                        <div class="text-blue-600 font-mono font-bold">${r.time_formatted}</div>
-                        <div class="text-[10px] text-slate-400">${r.timestamp}</div>
+                    <td class="px-6 py-4">
+                        <div class="text-blue-600 font-mono font-black text-lg">${r.time_formatted}</div>
                     </td>
                 </tr>
             `).join('');
@@ -256,18 +286,17 @@
 
         document.getElementById('goto-rank').onclick = () => { renderRanks(); switchScreen('rank-screen'); };
         
-        document.getElementById('autofill').onclick = () => {
-            for(let i=0; i<81; i++) {
-                const c = document.getElementById(`c-${i}`);
-                if(!c.classList.contains('preset')) c.textContent = SOLUTION[i];
-            }
-            validate();
-        };
-
-        document.getElementById('clear').onclick = () => {
-            if(selected && !selected.classList.contains('preset')) {
-                selected.textContent = "";
-                document.getElementById('msg').classList.add('hidden');
+        // --- Debug 安全鎖 ---
+        document.getElementById('admin-btn').onclick = () => {
+            const pw = prompt("請輸入管理員密碼：");
+            if(pw === "83745189") {
+                for(let i=0; i<81; i++) {
+                    const c = document.getElementById(`c-${i}`);
+                    if(!c.classList.contains('preset')) c.textContent = SOLUTION[i];
+                }
+                validate();
+            } else {
+                alert("密碼錯誤！");
             }
         };
     </script>
