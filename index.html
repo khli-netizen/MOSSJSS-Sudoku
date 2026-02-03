@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSSJSS Sudoku Challenge - Data Collection Version</title>
+    <title>MOSSJSS Sudoku - Cloud Saving Version</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -13,7 +13,6 @@
         .sudoku-cell:hover { background: #f0f9ff; }
         .sudoku-cell.selected { background: #dbeafe !important; box-shadow: inset 0 0 0 2px #3b82f6; }
         .sudoku-cell.preset { background: #f1f5f9; color: #1e40af; font-weight: 800; cursor: not-allowed; }
-        /* 3x3 Grid Borders */
         .border-r-thick { border-right: 3px solid #1e3a8a !important; }
         .border-b-thick { border-bottom: 3px solid #1e3a8a !important; }
     </style>
@@ -24,14 +23,14 @@
         
         <header class="text-center py-6">
             <h1 class="text-3xl font-extrabold text-blue-900 tracking-tight">MOSSJSS Sudoku</h1>
-            <p class="text-blue-600 font-medium">Level 2 數據採集系統</p>
+            <p class="text-blue-600 font-medium">雲端成績採集系統 (Google Form 版)</p>
         </header>
 
         <main id="reg-screen" class="bg-white p-8 rounded-3xl shadow-xl border border-blue-100">
             <form id="reg-form" class="space-y-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">學生姓名 (Name)</label>
-                    <input type="text" id="name" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="輸入中文或英文姓名">
+                    <input type="text" id="name" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="輸入姓名">
                 </div>
                 <div class="grid grid-cols-3 gap-4">
                     <div>
@@ -51,7 +50,7 @@
                         <select id="num" class="w-full px-3 py-3 border rounded-xl bg-white" required></select>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-200">🎯 開始計時挑戰</button>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg">🎯 開始計時挑戰</button>
             </form>
             <button id="goto-rank" class="w-full mt-6 text-slate-500 hover:text-blue-600 text-sm font-medium transition">🏆 查看現有成績記錄</button>
         </main>
@@ -61,22 +60,16 @@
                 <div class="flex justify-between items-center mb-4 px-2">
                     <div class="text-sm">
                         <span id="p-name" class="font-bold text-blue-900"></span>
-                        <button id="autofill" class="ml-2 text-[10px] bg-slate-100 text-slate-400 px-2 py-1 rounded">AUTO-SOLVE (DEBUG)</button>
+                        <button id="autofill" class="ml-2 text-[10px] bg-slate-100 text-slate-400 px-2 py-1 rounded">DEBUG</button>
                     </div>
-                    <div class="text-right">
-                        <div id="timer-display" class="text-2xl font-mono font-bold text-blue-600">00:00</div>
-                    </div>
+                    <div id="timer-display" class="text-2xl font-mono font-bold text-blue-600">00:00</div>
                 </div>
-
                 <div id="grid" class="sudoku-grid"></div>
-
                 <div id="numpad" class="grid grid-cols-9 gap-1 mt-6"></div>
-
                 <div id="msg" class="hidden mt-4 p-4 rounded-xl text-center font-bold"></div>
-
                 <div class="flex gap-3 mt-6">
                     <button id="clear" class="flex-1 bg-slate-100 py-4 rounded-xl font-bold text-slate-600">清除</button>
-                    <button id="submit" class="hidden flex-1 bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-green-100">🏆 提交成績</button>
+                    <button id="submit" class="hidden flex-1 bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg">🏆 提交成績</button>
                 </div>
             </div>
         </main>
@@ -84,32 +77,20 @@
         <main id="rank-screen" class="hidden">
             <div class="bg-white p-6 rounded-3xl shadow-xl border border-blue-100">
                 <h2 class="text-2xl font-extrabold text-slate-800 mb-6 text-center">🏆 挑戰成績匯總</h2>
-                
                 <div class="overflow-x-auto mb-6">
                     <table class="w-full text-sm text-left">
-                        <thead class="bg-slate-50 text-slate-500 uppercase">
-                            <tr>
-                                <th class="px-4 py-3">學生資訊</th>
-                                <th class="px-4 py-3">完成時間</th>
-                            </tr>
+                        <thead class="bg-slate-50 text-slate-500">
+                            <tr><th class="px-4 py-3">學生資訊</th><th class="px-4 py-3">完成時間</th></tr>
                         </thead>
                         <tbody id="rank-tbody" class="divide-y"></tbody>
                     </table>
                 </div>
-
-                <button id="export-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition">
-                    📥 匯出 Excel 成績表 (CSV)
-                </button>
-                
-                <button onclick="location.reload()" class="w-full mt-4 py-3 text-slate-400 font-medium">返回報名頁面</button>
+                <button onclick="location.reload()" class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold">返回首頁</button>
             </div>
         </main>
     </div>
 
     <script>
-        /**
-         * Sudoku Core Data
-         */
         const PUZZLE = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
         const SOLUTION = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
 
@@ -117,7 +98,6 @@
         let player = {};
         let database = JSON.parse(localStorage.getItem('mossjss_records') || '[]');
 
-        // Setup class numbers
         const numDropdown = document.getElementById('num');
         for(let i=1; i<=35; i++) numDropdown.add(new Option(i, i));
 
@@ -126,7 +106,6 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // --- GRID GENERATION ---
         function initGame() {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
@@ -134,7 +113,6 @@
                 const cell = document.createElement('div');
                 cell.className = 'sudoku-cell';
                 const row = Math.floor(i/9), col = i%9;
-                
                 if(col === 2 || col === 5) cell.classList.add('border-r-thick');
                 if(row === 2 || row === 5) cell.classList.add('border-b-thick');
 
@@ -156,7 +134,7 @@
             pad.innerHTML = '';
             for(let i=1; i<=9; i++) {
                 const b = document.createElement('button');
-                b.className = 'bg-blue-50 text-blue-700 py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition';
+                b.className = 'bg-blue-50 text-blue-700 py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white';
                 b.textContent = i;
                 b.onclick = () => {
                     if(selected && !selected.classList.contains('preset')) {
@@ -170,25 +148,21 @@
 
         function validate() {
             let current = "";
-            for(let i=0; i<81; i++) {
-                current += document.getElementById(`c-${i}`).textContent || "0";
-            }
-            
+            for(let i=0; i<81; i++) current += document.getElementById(`c-${i}`).textContent || "0";
             const msg = document.getElementById('msg');
             if(!current.includes("0")) {
                 if(current === SOLUTION) {
                     clearInterval(interval);
-                    msg.innerHTML = "🎉 完美完成！<br>請點擊下方按鈕提交你的成績。";
+                    msg.innerHTML = "🎉 完美完成！<br>點擊下方按鈕提交成績。";
                     msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-green-50 text-green-700 block";
                     document.getElementById('submit').classList.remove('hidden');
                 } else {
-                    msg.textContent = "⚠️ 數字填充完畢，但其中有錯誤。";
+                    msg.textContent = "⚠️ 填充完畢但有錯誤。";
                     msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-red-50 text-red-600 block";
                 }
             }
         }
 
-        // --- EVENTS ---
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
             player = {
@@ -208,6 +182,62 @@
             }, 1000);
         };
 
+        // --- 核心：雲端提交功能 ---
+        document.getElementById('submit').onclick = () => {
+            const finalTimeStr = document.getElementById('timer-display').textContent;
+            const now = new Date().toLocaleString('zh-TW');
+
+            // Google Form 設定
+            const formID = "1FAIpQLSfkleuXoAlsbivdiWNYzriMBHcB4HGD_DJYWFvZmTNGvbrKnw";
+            const entryIDs = {
+                name: "entry.444738584",
+                year: "entry.174779691",
+                section: "entry.1448651811",
+                num: "entry.1882103433",
+                seconds: "entry.1064789886",
+                timeStr: "entry.579178465",
+                timestamp: "entry.254131566"
+            };
+
+            const baseURL = `https://docs.google.com/forms/d/e/${formID}/formResponse`;
+            const params = new URLSearchParams();
+            params.append(entryIDs.name, player.name);
+            params.append(entryIDs.year, player.year);
+            params.append(entryIDs.section, player.section);
+            params.append(entryIDs.num, player.num);
+            params.append(entryIDs.seconds, seconds);
+            params.append(entryIDs.timeStr, finalTimeStr);
+            params.append(entryIDs.timestamp, now);
+
+            // 發送至 Google Form (no-cors 模式)
+            fetch(baseURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            }).then(() => {
+                alert("🏆 成績已成功上傳至 Google 雲端！");
+                // 儲存至本地並跳轉
+                const record = { ...player, total_seconds: seconds, time_formatted: finalTimeStr, timestamp: now };
+                database.push(record);
+                database.sort((a,b) => a.total_seconds - b.total_seconds);
+                localStorage.setItem('mossjss_records', JSON.stringify(database));
+                renderRanks();
+                switchScreen('rank-screen');
+            }).catch(() => alert("上傳失敗，請檢查網路連線。"));
+        };
+
+        function renderRanks() {
+            const body = document.getElementById('rank-tbody');
+            body.innerHTML = database.map((r) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3"><div class="font-bold">${r.name}</div><div class="text-xs text-slate-500">${r.year}${r.section} | ${r.num}號</div></td>
+                    <td class="px-4 py-3"><div class="text-blue-600 font-mono font-bold">${r.time_formatted}</div></td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('goto-rank').onclick = () => { renderRanks(); switchScreen('rank-screen'); };
         document.getElementById('autofill').onclick = () => {
             for(let i=0; i<81; i++) {
                 const c = document.getElementById(`c-${i}`);
@@ -215,60 +245,6 @@
             }
             validate();
         };
-
-        document.getElementById('submit').onclick = () => {
-            const finalTimeStr = document.getElementById('timer-display').textContent;
-            const record = {
-                ...player,
-                total_seconds: seconds,
-                time_formatted: finalTimeStr,
-                timestamp: new Date().toLocaleString('zh-TW')
-            };
-            database.push(record);
-            database.sort((a,b) => a.total_seconds - b.total_seconds);
-            localStorage.setItem('mossjss_records', JSON.stringify(database));
-            renderRanks();
-            switchScreen('rank-screen');
-        };
-
-        function renderRanks() {
-            const body = document.getElementById('rank-tbody');
-            body.innerHTML = database.map((r, i) => `
-                <tr class="hover:bg-slate-50">
-                    <td class="px-4 py-3">
-                        <div class="font-bold text-slate-800">${r.name}</div>
-                        <div class="text-xs text-slate-500">${r.year}${r.section}班 | 座號: ${r.num}</div>
-                    </td>
-                    <td class="px-4 py-3">
-                        <div class="text-blue-600 font-mono font-bold">${r.time_formatted}</div>
-                        <div class="text-[10px] text-slate-400">${r.timestamp}</div>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        document.getElementById('goto-rank').onclick = () => {
-            renderRanks();
-            switchScreen('rank-screen');
-        };
-
-        document.getElementById('export-btn').onclick = () => {
-            if(database.length === 0) return alert("目前沒有成績記錄可匯出！");
-            
-            // CSV Column Headers
-            let csv = '\uFEFF姓名,年級(Form),班別(Section),座號(Number),總秒數(Seconds),完成時間(Duration),提交日期(Finish Time)\n';
-            
-            database.forEach(r => {
-                csv += `${r.name},${r.year},${r.section},${r.num},${r.total_seconds},${r.time_formatted},${r.timestamp}\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `Sudoku_Competition_Results_${new Date().toISOString().slice(0,10)}.csv`;
-            link.click();
-        };
-
         document.getElementById('clear').onclick = () => {
             if(selected && !selected.classList.contains('preset')) {
                 selected.textContent = "";
