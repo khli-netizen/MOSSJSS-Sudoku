@@ -3,258 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSSJSS Sudoku Level 2 - Testing Version</title>
+    <title>MOSSJSS Sudoku Challenge - Data Collection Version</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Noto Sans TC', sans-serif; box-sizing: border-box; }
-        .sudoku-cell {
-            width: 100%; height: 100%; text-align: center; font-size: 1.25rem;
-            font-weight: 600; background: white; border: 1px solid #cbd5e1; transition: all 0.2s;
-        }
-        .sudoku-cell:focus { outline: none; background: #dbeafe; border-color: #3b82f6; z-index: 10; }
-        .sudoku-cell.preset { background: #f1f5f9; color: #1e40af; font-weight: 700; cursor: not-allowed; }
-        .thick-right { border-right: 3px solid #1e40af !important; }
-        .thick-bottom { border-bottom: 3px solid #1e40af !important; }
-        .thick-left { border-left: 3px solid #1e40af !important; }
-        .thick-top { border-top: 3px solid #1e40af !important; }
+        .sudoku-grid { display: grid; grid-template-columns: repeat(9, 1fr); background-color: #1e3a8a; border: 3px solid #1e3a8a; gap: 1px; }
+        .sudoku-cell { width: 100%; aspect-ratio: 1/1; text-align: center; background: white; font-size: 1.25rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .sudoku-cell:hover { background: #f0f9ff; }
+        .sudoku-cell.selected { background: #dbeafe !important; box-shadow: inset 0 0 0 2px #3b82f6; }
+        .sudoku-cell.preset { background: #f1f5f9; color: #1e40af; font-weight: 800; cursor: not-allowed; }
+        /* 3x3 Grid Borders */
+        .border-r-thick { border-right: 3px solid #1e3a8a !important; }
+        .border-b-thick { border-bottom: 3px solid #1e3a8a !important; }
     </style>
 </head>
-<body class="h-full bg-slate-50 text-slate-900">
+<body class="h-full bg-slate-100 text-slate-900">
 
-    <div id="app-wrapper" class="max-w-xl mx-auto h-full p-4">
+    <div id="app" class="max-w-xl mx-auto min-h-full p-4 flex flex-col">
         
-        <section id="registration-screen" class="flex flex-col justify-center h-full">
-            <div class="bg-white p-8 rounded-2xl shadow-xl border border-blue-100 text-center">
-                <h1 class="text-3xl font-bold text-blue-900 mb-2">MOSSJSS Sudoku</h1>
-                <p class="text-blue-600 mb-8">Level 2 測試版</p>
-                
-                <form id="reg-form" class="space-y-4 text-left">
-                    <div>
-                        <label class="block text-sm font-bold mb-1">姓名</label>
-                        <input type="text" id="user-name" required class="w-full p-3 border rounded-lg" placeholder="請輸入姓名">
-                    </div>
-                    <div class="grid grid-cols-3 gap-3">
-                        <select id="user-year" class="p-3 border rounded-lg" required>
-                            <option value="">年級</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
-                        </select>
-                        <select id="user-section" class="p-3 border rounded-lg" required>
-                            <option value="">班別</option><option>A</option><option>G</option><option>L</option><option>S</option>
-                        </select>
-                        <select id="user-num" class="p-3 border rounded-lg" required>
-                            <option value="">座號</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition">🎯 開始挑戰</button>
-                </form>
-                <button id="view-rank-btn" class="w-full mt-4 text-blue-600 font-medium">🏆 查看龍虎榜</button>
-            </div>
-        </section>
+        <header class="text-center py-6">
+            <h1 class="text-3xl font-extrabold text-blue-900 tracking-tight">MOSSJSS Sudoku</h1>
+            <p class="text-blue-600 font-medium">Level 2 數據採集系統</p>
+        </header>
 
-        <section id="game-screen" class="hidden py-4">
-            <div class="bg-white p-4 rounded-2xl shadow-xl">
-                <div class="flex justify-between items-end mb-4">
+        <main id="reg-screen" class="bg-white p-8 rounded-3xl shadow-xl border border-blue-100">
+            <form id="reg-form" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">學生姓名 (Name)</label>
+                    <input type="text" id="name" required class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="輸入中文或英文姓名">
+                </div>
+                <div class="grid grid-cols-3 gap-4">
                     <div>
-                        <h2 id="display-player" class="font-bold text-blue-900">載入中...</h2>
-                        <button id="btn-autofill" class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded mt-1 uppercase font-bold">測試: 自動填寫</button>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">年級 (Form)</label>
+                        <select id="year" class="w-full px-3 py-3 border rounded-xl bg-white" required>
+                            <option value="">選擇</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">班別 (Class)</label>
+                        <select id="section" class="w-full px-3 py-3 border rounded-xl bg-white" required>
+                            <option value="">選擇</option><option>A</option><option>G</option><option>L</option><option>S</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">座號 (No.)</label>
+                        <select id="num" class="w-full px-3 py-3 border rounded-xl bg-white" required></select>
+                    </div>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-blue-200">🎯 開始計時挑戰</button>
+            </form>
+            <button id="goto-rank" class="w-full mt-6 text-slate-500 hover:text-blue-600 text-sm font-medium transition">🏆 查看現有成績記錄</button>
+        </main>
+
+        <main id="game-screen" class="hidden">
+            <div class="bg-white p-4 rounded-3xl shadow-xl border border-blue-100">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <div class="text-sm">
+                        <span id="p-name" class="font-bold text-blue-900"></span>
+                        <button id="autofill" class="ml-2 text-[10px] bg-slate-100 text-slate-400 px-2 py-1 rounded">AUTO-SOLVE (DEBUG)</button>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-gray-400 block">TIME</span>
-                        <span id="game-timer" class="text-2xl font-mono font-bold text-blue-600">00:00</span>
+                        <div id="timer-display" class="text-2xl font-mono font-bold text-blue-600">00:00</div>
                     </div>
                 </div>
 
-                <div id="grid-container" class="grid grid-cols-9 aspect-square border-4 border-blue-900 rounded-lg overflow-hidden bg-blue-900 gap-[1px]">
-                    </div>
+                <div id="grid" class="sudoku-grid"></div>
 
-                <div id="numpad" class="grid grid-cols-9 gap-1 mt-4">
-                    </div>
+                <div id="numpad" class="grid grid-cols-9 gap-1 mt-6"></div>
 
-                <div id="status-msg" class="hidden my-4 p-3 rounded-lg text-center font-bold"></div>
+                <div id="msg" class="hidden mt-4 p-4 rounded-xl text-center font-bold"></div>
 
-                <div class="flex gap-2 mt-4">
-                    <button id="btn-clear" class="flex-1 bg-gray-100 py-3 rounded-lg font-bold">清除</button>
-                    <button id="btn-submit" class="hidden flex-1 bg-green-600 text-white py-3 rounded-lg font-bold">🏆 提交成績</button>
+                <div class="flex gap-3 mt-6">
+                    <button id="clear" class="flex-1 bg-slate-100 py-4 rounded-xl font-bold text-slate-600">清除</button>
+                    <button id="submit" class="hidden flex-1 bg-green-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-green-100">🏆 提交成績</button>
                 </div>
             </div>
-        </section>
+        </main>
 
-        <section id="rank-screen" class="hidden py-4">
-            <div class="bg-white p-6 rounded-2xl shadow-xl">
-                <h2 class="text-2xl font-bold text-center mb-6">🏆 龍虎榜</h2>
-                <div class="overflow-hidden border rounded-lg mb-4">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-blue-600 text-white text-sm">
+        <main id="rank-screen" class="hidden">
+            <div class="bg-white p-6 rounded-3xl shadow-xl border border-blue-100">
+                <h2 class="text-2xl font-extrabold text-slate-800 mb-6 text-center">🏆 挑戰成績匯總</h2>
+                
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 uppercase">
                             <tr>
-                                <th class="p-3">排名</th><th class="p-3">姓名</th><th class="p-3">時間</th>
+                                <th class="px-4 py-3">學生資訊</th>
+                                <th class="px-4 py-3">完成時間</th>
                             </tr>
                         </thead>
-                        <tbody id="rank-list" class="divide-y"></tbody>
+                        <tbody id="rank-tbody" class="divide-y"></tbody>
                     </table>
                 </div>
-                <button id="btn-export" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold mb-3">📥 匯出成績 (Excel/CSV)</button>
-                <button onclick="location.reload()" class="w-full bg-gray-200 py-3 rounded-lg font-bold">返回首頁</button>
-            </div>
-        </section>
 
+                <button id="export-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition">
+                    📥 匯出 Excel 成績表 (CSV)
+                </button>
+                
+                <button onclick="location.reload()" class="w-full mt-4 py-3 text-slate-400 font-medium">返回報名頁面</button>
+            </div>
+        </main>
     </div>
 
     <script>
-        // CONFIG & DATA
-        const PUZZLE_STR = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
-        const SOLVE_STR  = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
-        
-        let timer = 0, timerInt, selectedCell = null;
-        let userData = {}, leaderboard = JSON.parse(localStorage.getItem('sudoku_scores') || '[]');
+        /**
+         * Sudoku Core Data
+         */
+        const PUZZLE = "530070000600195000098000060800060003400803001700020006060000280000419005000080079";
+        const SOLUTION = "534678912672195348198342567859761423426853791713924856961537284287419635345286179";
 
-        // INITIALIZE
-        const numSelect = document.getElementById('user-num');
-        for(let i=1; i<=35; i++) numSelect.add(new Option(i, i));
+        let seconds = 0, interval, selected = null;
+        let player = {};
+        let database = JSON.parse(localStorage.getItem('mossjss_records') || '[]');
 
-        function showScreen(id) {
-            ['registration-screen', 'game-screen', 'rank-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
+        // Setup class numbers
+        const numDropdown = document.getElementById('num');
+        for(let i=1; i<=35; i++) numDropdown.add(new Option(i, i));
+
+        function switchScreen(id) {
+            ['reg-screen', 'game-screen', 'rank-screen'].forEach(s => document.getElementById(s).classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
         }
 
-        // GRID LOGIC
-        function buildGrid() {
-            const container = document.getElementById('grid-container');
-            container.innerHTML = '';
+        // --- GRID GENERATION ---
+        function initGame() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
             for(let i=0; i<81; i++) {
-                const row = Math.floor(i/9), col = i%9;
-                const cell = document.createElement('input');
-                cell.type = 'text'; cell.readOnly = true;
+                const cell = document.createElement('div');
                 cell.className = 'sudoku-cell';
-                if(col === 2 || col === 5) cell.classList.add('thick-right');
-                if(row === 2 || row === 5) cell.classList.add('thick-bottom');
+                const row = Math.floor(i/9), col = i%9;
                 
-                const val = PUZZLE_STR[i];
-                if(val !== '0') {
-                    cell.value = val;
+                if(col === 2 || col === 5) cell.classList.add('border-r-thick');
+                if(row === 2 || row === 5) cell.classList.add('border-b-thick');
+
+                if(PUZZLE[i] !== '0') {
+                    cell.textContent = PUZZLE[i];
                     cell.classList.add('preset');
                 } else {
                     cell.onclick = () => {
-                        if(selectedCell) selectedCell.style.background = 'white';
-                        selectedCell = cell;
-                        cell.style.background = '#dbeafe';
+                        if(selected) selected.classList.remove('selected');
+                        selected = cell;
+                        cell.classList.add('selected');
                     };
                 }
-                cell.dataset.index = i;
-                container.appendChild(cell);
+                cell.id = `c-${i}`;
+                grid.appendChild(cell);
             }
-        }
 
-        function buildNumpad() {
             const pad = document.getElementById('numpad');
+            pad.innerHTML = '';
             for(let i=1; i<=9; i++) {
                 const b = document.createElement('button');
-                b.className = 'bg-blue-100 py-3 rounded font-bold hover:bg-blue-200';
+                b.className = 'bg-blue-50 text-blue-700 py-3 rounded-lg font-bold hover:bg-blue-600 hover:text-white transition';
                 b.textContent = i;
                 b.onclick = () => {
-                    if(selectedCell && !selectedCell.classList.contains('preset')) {
-                        selectedCell.value = i;
-                        checkWin();
+                    if(selected && !selected.classList.contains('preset')) {
+                        selected.textContent = i;
+                        validate();
                     }
                 };
                 pad.appendChild(b);
             }
         }
 
-        function checkWin() {
-            const cells = document.querySelectorAll('.sudoku-cell');
-            let currentStr = "";
-            cells.forEach(c => currentStr += c.value || "0");
+        function validate() {
+            let current = "";
+            for(let i=0; i<81; i++) {
+                current += document.getElementById(`c-${i}`).textContent || "0";
+            }
             
-            if(!currentStr.includes("0")) {
-                if(currentStr === SOLVE_STR) {
-                    clearInterval(timerInt);
-                    const msg = document.getElementById('status-msg');
-                    msg.textContent = "✅ 挑戰成功！";
-                    msg.className = "my-4 p-3 rounded-lg text-center font-bold bg-green-100 text-green-700";
-                    msg.classList.remove('hidden');
-                    document.getElementById('btn-submit').classList.remove('hidden');
+            const msg = document.getElementById('msg');
+            if(!current.includes("0")) {
+                if(current === SOLUTION) {
+                    clearInterval(interval);
+                    msg.innerHTML = "🎉 完美完成！<br>請點擊下方按鈕提交你的成績。";
+                    msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-green-50 text-green-700 block";
+                    document.getElementById('submit').classList.remove('hidden');
                 } else {
-                    const msg = document.getElementById('status-msg');
-                    msg.textContent = "❌ 答案有誤，請再檢查";
-                    msg.className = "my-4 p-3 rounded-lg text-center font-bold bg-red-100 text-red-700";
-                    msg.classList.remove('hidden');
+                    msg.textContent = "⚠️ 數字填充完畢，但其中有錯誤。";
+                    msg.className = "mt-4 p-4 rounded-xl text-center font-bold bg-red-50 text-red-600 block";
                 }
             }
         }
 
-        // EVENT HANDLERS
+        // --- EVENTS ---
         document.getElementById('reg-form').onsubmit = (e) => {
             e.preventDefault();
-            userData = {
-                name: document.getElementById('user-name').value,
-                year: document.getElementById('user-year').value,
-                sec: document.getElementById('user-section').value,
-                num: document.getElementById('user-num').value
+            player = {
+                name: document.getElementById('name').value.trim(),
+                year: document.getElementById('year').value,
+                section: document.getElementById('section').value,
+                num: document.getElementById('num').value
             };
-            document.getElementById('display-player').textContent = `${userData.name} (${userData.year}${userData.sec})`;
-            buildGrid(); buildNumpad();
-            showScreen('game-screen');
-            timerInt = setInterval(() => {
-                timer++;
-                const m = Math.floor(timer/60).toString().padStart(2,'0');
-                const s = (timer%60).toString().padStart(2,'0');
-                document.getElementById('game-timer').textContent = `${m}:${s}`;
+            document.getElementById('p-name').textContent = `${player.name} - ${player.year}${player.section}班 (${player.num}號)`;
+            initGame();
+            switchScreen('game-screen');
+            interval = setInterval(() => {
+                seconds++;
+                const m = Math.floor(seconds/60).toString().padStart(2,'0');
+                const s = (seconds%60).toString().padStart(2,'0');
+                document.getElementById('timer-display').textContent = `${m}:${s}`;
             }, 1000);
         };
 
-        document.getElementById('btn-autofill').onclick = () => {
-            const cells = document.querySelectorAll('.sudoku-cell');
-            cells.forEach((c, idx) => c.value = SOLVE_STR[idx]);
-            checkWin();
+        document.getElementById('autofill').onclick = () => {
+            for(let i=0; i<81; i++) {
+                const c = document.getElementById(`c-${i}`);
+                if(!c.classList.contains('preset')) c.textContent = SOLUTION[i];
+            }
+            validate();
         };
 
-        document.getElementById('btn-submit').onclick = () => {
-            const score = {
-                ...userData,
-                time: timer,
-                timeStr: document.getElementById('game-timer').textContent,
-                date: new Date().toLocaleString()
+        document.getElementById('submit').onclick = () => {
+            const finalTimeStr = document.getElementById('timer-display').textContent;
+            const record = {
+                ...player,
+                total_seconds: seconds,
+                time_formatted: finalTimeStr,
+                timestamp: new Date().toLocaleString('zh-TW')
             };
-            leaderboard.push(score);
-            leaderboard.sort((a,b) => a.time - b.time);
-            localStorage.setItem('sudoku_scores', JSON.stringify(leaderboard));
-            renderLeaderboard();
-            showScreen('rank-screen');
+            database.push(record);
+            database.sort((a,b) => a.total_seconds - b.total_seconds);
+            localStorage.setItem('mossjss_records', JSON.stringify(database));
+            renderRanks();
+            switchScreen('rank-screen');
         };
 
-        function renderLeaderboard() {
-            const list = document.getElementById('rank-list');
-            list.innerHTML = leaderboard.map((s, i) => `
-                <tr class="${i<3?'font-bold':''}">
-                    <td class="p-3">${i+1}</td>
-                    <td class="p-3">${s.name} (${s.year}${s.sec})</td>
-                    <td class="p-3 text-blue-600">${s.timeStr}</td>
+        function renderRanks() {
+            const body = document.getElementById('rank-tbody');
+            body.innerHTML = database.map((r, i) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-4 py-3">
+                        <div class="font-bold text-slate-800">${r.name}</div>
+                        <div class="text-xs text-slate-500">${r.year}${r.section}班 | 座號: ${r.num}</div>
+                    </td>
+                    <td class="px-4 py-3">
+                        <div class="text-blue-600 font-mono font-bold">${r.time_formatted}</div>
+                        <div class="text-[10px] text-slate-400">${r.timestamp}</div>
+                    </td>
                 </tr>
             `).join('');
         }
 
-        document.getElementById('view-rank-btn').onclick = () => {
-            renderLeaderboard();
-            showScreen('rank-screen');
+        document.getElementById('goto-rank').onclick = () => {
+            renderRanks();
+            switchScreen('rank-screen');
         };
 
-        document.getElementById('btn-export').onclick = () => {
-            let csv = '\uFEFF排名,姓名,班級,座號,秒數,格式化時間,日期\n';
-            leaderboard.forEach((s, i) => {
-                csv += `${i+1},${s.name},${s.year}${s.sec},${s.num},${s.time},${s.timeStr},${s.date}\n`;
+        document.getElementById('export-btn').onclick = () => {
+            if(database.length === 0) return alert("目前沒有成績記錄可匯出！");
+            
+            // CSV Column Headers
+            let csv = '\uFEFF姓名,年級(Form),班別(Section),座號(Number),總秒數(Seconds),完成時間(Duration),提交日期(Finish Time)\n';
+            
+            database.forEach(r => {
+                csv += `${r.name},${r.year},${r.section},${r.num},${r.total_seconds},${r.time_formatted},${r.timestamp}\n`;
             });
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `Sudoku_Results_${new Date().getTime()}.csv`;
+            link.download = `Sudoku_Competition_Results_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
         };
 
-        document.getElementById('btn-clear').onclick = () => {
-            if(selectedCell && !selectedCell.classList.contains('preset')) {
-                selectedCell.value = "";
-                document.getElementById('status-msg').classList.add('hidden');
-                document.getElementById('btn-submit').classList.add('hidden');
+        document.getElementById('clear').onclick = () => {
+            if(selected && !selected.classList.contains('preset')) {
+                selected.textContent = "";
+                document.getElementById('msg').classList.add('hidden');
             }
         };
     </script>
